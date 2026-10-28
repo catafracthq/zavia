@@ -165,14 +165,6 @@ h2 .thin{display:block;font-weight:300;color:var(--verde)}
 .cot-form{display:flex;flex-direction:column;gap:28px;min-width:0}
 .cot-form fieldset{margin:0;padding:0;border:0;min-width:0}
 .lbl{display:block;margin-bottom:12px;font-size:12px;line-height:16px;letter-spacing:.12em;color:var(--verde)}
-.chips{display:flex;flex-wrap:wrap;gap:10px}
-.chip{position:relative}
-.chip input{position:absolute;opacity:0;width:1px;height:1px}
-.chip span{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:999px;border:1.5px solid #1C221933;background:#fff;font-size:15px;line-height:20px;cursor:pointer;transition:background-color .2s,border-color .2s,color .2s}
-.chip span:hover{border-color:var(--tinta)}
-.chip input:checked+span{background:var(--profundo);border-color:var(--profundo);color:var(--crema)}
-.chip input:focus-visible+span{outline:2px solid var(--verde);outline-offset:3px}
-.chip.bio input:checked+span{background:var(--tierra);border-color:var(--tierra)}
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .fields .full{grid-column:1/-1}
 .f{display:flex;flex-direction:column;gap:8px;min-width:0}
@@ -388,25 +380,13 @@ html{scroll-behavior:auto}
 <section class="sec cotiza" id="cotizar">
 <div class="wrap cot">
 <div class="cot-intro">
-<h2>Cotiza en un minuto.<span class="thin">Te respondemos por WhatsApp.</span></h2>
-<p>Elige qué necesitas y cuéntanos lo básico. Armamos el mensaje por ti para que llegue completo y podamos darte precio desde la primera respuesta.</p>
+<h2>Cotiza tu biofertilizante.<span class="thin">Te respondemos por WhatsApp.</span></h2>
+<p>Cuéntanos qué cultivas y cuántas hectáreas tienes. Armamos el mensaje por ti para darte precio de los sacos de 50 kg desde la primera respuesta.</p>
 </div>
 <form class="cot-form" id="cot-form" novalidate>
-<fieldset>
-<legend class="lbl mono">¿QUÉ NECESITAS?</legend>
-<div class="chips" id="cot-items">
-<label class="chip bio"><input type="radio" name="item" id="it-bio" value="bio" checked><span>Biofertilizante · sacos de 50 kg</span></label>
-<label class="chip"><input type="radio" name="item" id="it-hco" value="la huella de carbono organizacional"><span>Huella de carbono organizacional</span></label>
-<label class="chip"><input type="radio" name="item" id="it-hce" value="la huella de carbono de un evento"><span>Huella de carbono de eventos</span></label>
-<label class="chip"><input type="radio" name="item" id="it-dar" value="la declaración anual de residuos sólidos"><span>Declaración anual de residuos</span></label>
-<label class="chip"><input type="radio" name="item" id="it-man" value="el manifiesto de residuos sólidos"><span>Manifiesto de residuos</span></label>
-<label class="chip"><input type="radio" name="item" id="it-rep" value="un reporte de sostenibilidad"><span>Reporte de sostenibilidad</span></label>
-<label class="chip"><input type="radio" name="item" id="it-mon" value="los registros de monitoreo ambiental"><span>Monitoreo ambiental</span></label>
-</div>
-</fieldset>
 <div class="fields">
-<div class="f" data-bio><label for="cot-cultivo">Cultivo</label><select id="cot-cultivo"><option value="">Elige un cultivo</option><option>palta</option><option>uva</option><option>arándano</option><option>espárrago</option><option value="otro cultivo">otro</option></select></div>
-<div class="f" data-bio><label for="cot-ha">Hectáreas <small>(aprox.)</small></label><input id="cot-ha" type="number" inputmode="decimal" min="0" step="any" placeholder="Ej. 25"></div>
+<div class="f"><label for="cot-cultivo">Cultivo</label><select id="cot-cultivo"><option value="">Elige un cultivo</option><option>palta</option><option>uva</option><option>arándano</option><option>espárrago</option><option value="otro cultivo">otro</option></select></div>
+<div class="f"><label for="cot-ha">Hectáreas <small>(aprox.)</small></label><input id="cot-ha" type="number" inputmode="decimal" min="0" step="any" placeholder="Ej. 25"></div>
 <div class="f"><label for="cot-nombre">Tu nombre</label><input id="cot-nombre" type="text" autocomplete="name" placeholder="Ej. Rosa Quispe"></div>
 <div class="f"><label for="cot-empresa">Empresa o fundo <small>(opcional)</small></label><input id="cot-empresa" type="text" autocomplete="organization" placeholder="Ej. Fundo Santa Rosa"></div>
 <div class="f full"><label for="cot-lugar">Distrito o provincia</label><input id="cot-lugar" type="text" placeholder="Ej. Imperial, Cañete"></div>
@@ -457,29 +437,22 @@ small.addEventListener("change",setup);setup();
 const $=id=>document.getElementById(id);
 const form=$("cot-form"),bubble=$("cot-bubble"),send=$("cot-send"),fl=$("wa-float"),cot=$("cotizar");
 if(!form)return;
-const bioOnly=[...form.querySelectorAll("[data-bio]")];
 const val=id=>$(id).value.trim();
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const build=()=>{
-const item=form.querySelector("input[name=item]:checked").value,isBio=item==="bio";
-bioOnly.forEach(el=>el.hidden=!isBio);
 const nombre=val("cot-nombre"),empresa=val("cot-empresa"),lugar=val("cot-lugar"),nota=val("cot-nota");
 const parts=[],marks=[];
 let saludo="Hola Zavia.";
 if(nombre){saludo=`Hola Zavia, soy ${nombre}`+(empresa?` de ${empresa}`:"")+".";marks.push(nombre);if(empresa)marks.push(empresa)}
 else if(empresa){saludo=`Hola Zavia, les escribo de ${empresa}.`;marks.push(empresa)}
 parts.push(saludo);
-if(isBio){
 const cultivo=$("cot-cultivo").value,ha=val("cot-ha");
 let s="Quiero cotizar biofertilizante en sacos de 50 kg";
-if(cultivo){s+=` para ${cultivo}`;marks.push(cultivo)}
-if(ha&&+ha>0){s+=`${cultivo?"":" para"} ${ha} ${+ha===1?"hectárea":"hectáreas"}`;marks.push(ha)}
+const hasHa=ha&&+ha>0;
+if(hasHa){s+=` para ${ha} ${+ha===1?"hectárea":"hectáreas"}`;marks.push(ha)}
+if(cultivo){s+=`${hasHa?" de":" para"} ${cultivo}`;marks.push(cultivo)}
 if(lugar){s+=` en ${lugar}`;marks.push(lugar)}
 parts.push(s+".");
-}else{
-parts.push(`Quiero información y precio para ${item}.`);
-if(lugar){parts.push(`Estamos en ${lugar}.`);marks.push(lugar)}
-}
 if(nota){parts.push(nota);marks.push(nota)}
 const text=parts.join(" ");
 send.href="https://wa.me/51942737699?text="+encodeURIComponent(text);
